@@ -1,0 +1,9 @@
+{
+  "version": 0.1,
+  "downloadURL": "https://dl.bte-germany.de/modpack.zip",
+  "addons": {
+    "optifine": {
+      "downloadUrl": ""
+    }
+  }
+}
