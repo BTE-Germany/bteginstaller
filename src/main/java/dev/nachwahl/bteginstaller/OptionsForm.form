@@ -30,12 +30,12 @@
               <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
             </constraints>
           </vspacer>
-          <component id="20d0" class="javax.swing.JCheckBox" binding="optiFineHDUG5CheckBox" default-binding="true">
+          <component id="20d0" class="javax.swing.JCheckBox" binding="commandMacrosCheckBox" default-binding="true">
             <constraints>
               <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="OptiFine HD U G5 (external download)"/>
+              <text value="Command Macros"/>
             </properties>
           </component>
           <component id="13125" class="javax.swing.JButton" binding="speichernButton" default-binding="true">
@@ -46,12 +46,12 @@
               <text value="Speichern"/>
             </properties>
           </component>
-          <component id="bf403" class="javax.swing.JCheckBox" binding="schematicaCheckBox" default-binding="true">
+          <component id="bf403" class="javax.swing.JCheckBox" binding="distantHorizonsCheckBox" default-binding="true">
             <constraints>
               <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Schematica"/>
+              <text value="Distant Horizons"/>
             </properties>
           </component>
           <component id="d62f5" class="javax.swing.JCheckBox" binding="replayModCheckBox" default-binding="true">

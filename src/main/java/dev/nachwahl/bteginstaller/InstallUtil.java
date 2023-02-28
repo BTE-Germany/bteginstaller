@@ -1,23 +1,27 @@
 package dev.nachwahl.bteginstaller;
 
 import com.google.gson.Gson;
-import jdk.nashorn.internal.parser.JSONParser;
 
 import javax.net.ssl.HttpsURLConnection;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.FloatControl;
 import javax.swing.*;
+import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
+import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.Scanner;
 
 public class InstallUtil {
-
     ArrayList<OptionalMod> optionalMods = new ArrayList<OptionalMod>();
     String versionurl = "";
     JFrame frame;
     InstallerInfo installerInfo;
+
 
     public InstallUtil(JFrame frame, String versionurl) {
         this.versionurl = versionurl;
@@ -66,26 +70,46 @@ public class InstallUtil {
     }
 
     public void removeOptionalMod(OptionalMod optionalMod) {
-        System.out.println("Removing optional mod: " + optionalMod.toString());
         if(optionalMods.contains(optionalMod)) {
             optionalMods.remove(optionalMod);
         }
     }
 
     public void addOptionalMod(OptionalMod optionalMod) {
-        System.out.println("Adding optional mod: " + optionalMod.toString());
         if(!optionalMods.contains(optionalMod)) {
             optionalMods.add(optionalMod);
         }
     }
 
-    public void startInstallation() {
-        JDialog loading = new JDialog(this.frame, "Installiere...", true);
-        loading.setContentPane(new LoadingForm().LoadingForm);
-        loading.setSize(500, 150);
-        loading.setVisible(true);
-        loading.toFront();
-        loading.repaint();
+    public void setOptionalMod(OptionalMod optionalMod, boolean active){
+        if(active){
+            addOptionalMod(optionalMod);
+        }else{
+            removeOptionalMod(optionalMod);
+        }
+    }
+
+    public boolean isOptionalModEnabled(OptionalMod optionalMod){
+        return optionalMods.contains(optionalMod);
+    }
+
+    public static synchronized void playSound(final String name) {
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+                    InputStream is = classloader.getResourceAsStream(name);
+                    Clip clip = AudioSystem.getClip();
+                    AudioInputStream inputStream = AudioSystem.getAudioInputStream(is);
+                    clip.open(inputStream);
+                    FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+                    gainControl.setValue(-30.0f);
+                    clip.start();
+                } catch (Exception e) {
+                    System.err.println(e.getMessage());
+                }
+            }
+        }).start();
     }
 
 

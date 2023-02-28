@@ -1,7 +1,5 @@
 package dev.nachwahl.bteginstaller;
 
-import com.formdev.flatlaf.FlatDarculaLaf;
-import com.formdev.flatlaf.FlatIntelliJLaf;
 import com.formdev.flatlaf.intellijthemes.FlatOneDarkIJTheme;
 
 import javax.imageio.ImageIO;
@@ -14,10 +12,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 public class Installer {
-
-
-
-
     public static void main(String[] args) {
 
         final String VERSIONURL = "https://bte-germany.de/api/getInstallerInfo";
@@ -30,10 +24,11 @@ public class Installer {
             e.printStackTrace();
         }
         InstallUtil installUtil = new InstallUtil(frame, VERSIONURL);
-
         frame.setContentPane(new MainForm(frame, installUtil).MainFormPanel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(500, 300);
+        frame.setSize(400, 400);
+        frame.setLocationRelativeTo(null);
+
         JMenuBar mb = new JMenuBar();
         JMenu about = new JMenu("About");
         about.addMenuListener(new MenuListener() {
