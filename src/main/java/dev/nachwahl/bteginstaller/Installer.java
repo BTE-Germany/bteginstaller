@@ -14,8 +14,6 @@ import java.net.URISyntaxException;
 public class Installer {
     public static void main(String[] args) {
 
-        final String VERSIONURL = "https://bte-germany.de/api/getInstallerInfo";
-
         FlatOneDarkIJTheme.install(new FlatOneDarkIJTheme());
         final JFrame frame = new JFrame("BTE Germany Installer");
         try {
@@ -23,7 +21,7 @@ public class Installer {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        InstallUtil installUtil = new InstallUtil(frame, VERSIONURL);
+        InstallUtil installUtil = new InstallUtil(frame);
         frame.setContentPane(new MainForm(frame, installUtil).MainFormPanel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(400, 400);

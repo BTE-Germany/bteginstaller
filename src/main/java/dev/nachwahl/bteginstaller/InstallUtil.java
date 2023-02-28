@@ -18,56 +18,15 @@ import java.util.Scanner;
 
 public class InstallUtil {
     ArrayList<OptionalMod> optionalMods = new ArrayList<OptionalMod>();
-    String versionurl = "";
     JFrame frame;
-    InstallerInfo installerInfo;
 
 
-    public InstallUtil(JFrame frame, String versionurl) {
-        this.versionurl = versionurl;
+    public InstallUtil(JFrame frame) {
         this.frame = frame;
         System.out.println("Init InstallUtil");
-        fetchInstallerInfo();
-    }
-
-    public InstallerInfo getInstallerInfo() {
-        return installerInfo;
-    }
-
-    private void fetchInstallerInfo() {
-        try {
-            URL url = new URL(this.versionurl);
-            HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            connection.connect();
-            String inline = "";
-            int responseCode = connection.getResponseCode();
-            if(responseCode != 200) {
-                throw new IOException("Version getting failed with code " + responseCode);
-            } else {
-                Scanner sc = new Scanner(url.openStream());
-                while (sc.hasNext()) {
-                    inline += sc.nextLine();
-                }
-                System.out.println(inline);
-                sc.close();
-                Gson gson = new Gson();
-                this.installerInfo = gson.fromJson(inline, InstallerInfo.class);
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(frame, "Es ist ein Fehler aufgetreten. Error: " + e.getMessage(), "Fehler", JOptionPane.ERROR_MESSAGE);
-            System.exit(-1);
-        }
     }
 
 
-    public String getVersionNumber() {
-        InstallerInfo installerInfo = getInstallerInfo();
-        return String.valueOf(installerInfo.version);
-
-    }
 
     public void removeOptionalMod(OptionalMod optionalMod) {
         if(optionalMods.contains(optionalMod)) {
@@ -115,8 +74,3 @@ public class InstallUtil {
 
 }
 
-class InstallerInfo {
-    public double version;
-    public String downloadURL;
-    InstallerInfo() {}
-}
