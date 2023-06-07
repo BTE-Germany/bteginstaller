@@ -11,18 +11,15 @@ public class LoadingForm{
     private JLabel installiereLabel;
     private InstallUtil installUtil;
 
-    public LoadingForm(InstallUtil installUtil, JFrame frame, JDialog loading) {
+    public LoadingForm(InstallUtil installUtil, JFrame frame, JDialog loading, String modpackVersion) {
 
         this.installUtil = installUtil;
-        InstallTask installTask = new InstallTask(installUtil,progressBar1,installiereLabel,loading);
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    installTask.execute();
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
+        InstallTask installTask = new InstallTask(installUtil,progressBar1,installiereLabel,loading, modpackVersion);
+        SwingUtilities.invokeLater(() -> {
+            try {
+                installTask.execute();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
         });
         frame.addWindowListener(new WindowAdapter() {
