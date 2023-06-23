@@ -1,20 +1,26 @@
 package dev.nachwahl.bteginstaller;
 
 import com.google.gson.*;
+import de.schlichtherle.truezip.file.TArchiveDetector;
+import de.schlichtherle.truezip.file.TFile;
+import de.schlichtherle.truezip.file.TFileInputStream;
+import org.apache.commons.io.FilenameUtils;
+
 import javax.swing.*;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.*;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Locale;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 public class InstallTask extends SwingWorker<Void, Integer> {
     String modpackDownloadURL;
     String fabricDownloadURL;
     String cmdKeybindURL;
-    String distantHorizonsURL;
     String replayModURL;
     String fabricLoaderVersion;
     String bteGermanyModpackVersion;
@@ -39,18 +45,16 @@ public class InstallTask extends SwingWorker<Void, Integer> {
                 modpackDownloadURL = "https://cdn.bte-germany.de/installer/1.19/modpack.zip";
                 fabricDownloadURL = "https://cdn.bte-germany.de/installer/1.19/fabric.zip";
                 cmdKeybindURL = "https://cdn.modrinth.com/data/h3r1moh7/versions/y3emEjYR/cmdkeybind-1.6.0-1.19.3.jar";
-                distantHorizonsURL = "https://cdn.modrinth.com/data/uCdwusMi/versions/P4psgCf3/DistantHorizons-1.6.10a-1.19.3.jar";
                 replayModURL = "https://cdn.modrinth.com/data/Nv2fQJo5/versions/EcNOFu8c/replaymod-1.19.3-2.6.10.jar";
                 fabricLoaderVersion = "fabric-loader-0.14.14-1.19.3";
                 bteGermanyModpackVersion = "BTE Germany v1.0";
                 break;
-            case "1.20 (latest)":
-                modpackDownloadURL = "https://cdn.bte-germany.de/installer/1.20/modpack.zip";
-                fabricDownloadURL = "https://cdn.bte-germany.de/installer/1.20/fabric.zip";
-                cmdKeybindURL = "https://cdn.modrinth.com/data/h3r1moh7/versions/y3emEjYR/cmdkeybind-1.6.0-1.19.3.jar";
-                distantHorizonsURL = "https://cdn.modrinth.com/data/uCdwusMi/versions/P4psgCf3/DistantHorizons-1.6.10a-1.19.3.jar";
-                replayModURL = "https://cdn.modrinth.com/data/Nv2fQJo5/versions/EcNOFu8c/replaymod-1.19.3-2.6.10.jar";
-                fabricLoaderVersion = "fabric-loader-0.14.21-1.20";
+            case "1.20.1 (latest)":
+                modpackDownloadURL = "https://cdn.bte-germany.de/installer/1.20.1/modpack.zip";
+                fabricDownloadURL = "https://cdn.bte-germany.de/installer/1.20.1/fabric.zip";
+                cmdKeybindURL = "https://cdn.modrinth.com/data/h3r1moh7/versions/snLr0hHP/cmdkeybind-1.6.3-1.20.jar";
+                replayModURL = "https://cdn.modrinth.com/data/Nv2fQJo5/versions/akFkhrL8/replaymod-1.20.1-2.6.13.jar";
+                fabricLoaderVersion = "fabric-loader-0.14.21-1.20.1";
                 bteGermanyModpackVersion = "BTE Germany v1.1";
                 break;
             default:
@@ -68,18 +72,21 @@ public class InstallTask extends SwingWorker<Void, Integer> {
             deleteOldFiles(installationPath);
             downloadModpack(modpackDownloadURL, installationPath);
             unzipModpack(installationPath);
+            //unzipFile(Paths.get(new File(installationPath.getAbsolutePath() + fileSeparator + "modpack.zip").getPath()));
             File modpackArchive = new File(installationPath.getAbsolutePath() + fileSeparator + "modpack.zip");
             modpackArchive.delete();
             downloadOptionalMods(installationPath + fileSeparator + "mods" + fileSeparator);
 
             // FABRIC
             downloadFabric(minecraftPath.getAbsolutePath().toString(), new URL(fabricDownloadURL));
+            //unzipFile(Paths.get(new File(minecraftPath.getAbsolutePath() + fileSeparator + "versions"+ fileSeparator + "fabric.zip").getPath()));
             unzipFabric(minecraftPath);
             File fabricArchive = new File(minecraftPath.getAbsolutePath() + fileSeparator + "versions"+ fileSeparator + "version.zip");
             fabricArchive.delete();
             editLauncherProfiles(minecraftPath, installationPath);
 
         } catch (IOException e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
         return null;
@@ -146,7 +153,7 @@ public class InstallTask extends SwingWorker<Void, Integer> {
     }
 
     private boolean unzipModpack(File installationPath) throws IOException {
-        progessLabel.setText("Entpacke Modpack...");
+        System.out.println("Entpacke Modpack...");
         ZipInputStream zis = new ZipInputStream(new FileInputStream(installationPath.getAbsolutePath() + fileSeparator + "modpack.zip"));
         ZipEntry zipEntry = zis.getNextEntry();
         long fileSize = zipEntry.getCompressedSize();
@@ -154,11 +161,13 @@ public class InstallTask extends SwingWorker<Void, Integer> {
         while (zipEntry != null) {
             String fileName = zipEntry.getName();
             String filePath = installationPath + fileSeparator + fileName;
+            System.out.println("Extracting file: " + filePath);
+            File file = new File(filePath);
 
-            if(!new File(filePath).exists()) {
+            if (!file.exists()) {
                 if (zipEntry.isDirectory()) {
-                    File dir = new File(filePath);
-                    dir.mkdir();
+                    file.mkdir();
+                    System.out.println("Created directory: " + filePath);
                 } else {
                     long zipFileSize = 0;
 
@@ -171,6 +180,7 @@ public class InstallTask extends SwingWorker<Void, Integer> {
                         progressBar.setValue((int) ((((double) zipFileSize) / ((double) fileSize)) * 100000d));
                     }
                     fos.close();
+                    System.out.println("Extracted file: " + filePath);
                 }
             }
             zipEntry = zis.getNextEntry();
@@ -178,15 +188,73 @@ public class InstallTask extends SwingWorker<Void, Integer> {
 
         zis.closeEntry();
         zis.close();
+        System.out.println("Modpack extraction complete.");
         return true;
+/*
+
+        System.out.println("Entpacke Modpack...");
+
+        TFile archive = new TFile(installationPath.getAbsolutePath() + fileSeparator + "modpack.zip");
+        TFile directory = new TFile(installationPath);
+        TFile.cp_rp(archive, directory, TArchiveDetector.NULL, TArchiveDetector.NULL);
+
+        System.out.println("Modpack extraction complete.");
+        return true;
+
+         */
     }
+    /*
+    private static void unzipFile(Path filePathToUnzip) {
+
+        Path targetDir = filePathToUnzip.getParent();
+
+        //Open the file
+        try (ZipFile zip = new ZipFile(filePathToUnzip.toFile())) {
+
+            FileSystem fileSystem = FileSystems.getDefault();
+            Enumeration<? extends ZipEntry> entries = zip.entries();
+
+            //We will unzip files in this folder
+            if (!targetDir.toFile().isDirectory()
+                    && !targetDir.toFile().mkdirs()) {
+                throw new IOException("failed to create directory " + targetDir);
+            }
+
+            //Iterate over entries
+            while (entries.hasMoreElements()) {
+                ZipEntry entry = entries.nextElement();
+                File f = new File(targetDir.resolve(Paths.get(entry.getName())).toString());
+
+                //If directory then create a new directory in uncompressed folder
+                if (entry.isDirectory()) {
+                    if (!f.isDirectory() && !f.mkdirs()) {
+                        throw new IOException("failed to create directory " + f);
+                    }
+                }
+
+                //Else create the file
+                else {
+                    File parent = f.getParentFile();
+                    if (!parent.isDirectory() && !parent.mkdirs()) {
+                        throw new IOException("failed to create directory " + parent);
+                    }
+
+                    try(InputStream in = zip.getInputStream(entry)) {
+                        Files.copy(in, f.toPath());
+                    }
+
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+     */
 
     private boolean downloadOptionalMods(String modsFolder) throws IOException {
         if (installUtil.isOptionalModEnabled(OptionalMod.COMMAND_MACROS)) {
             downloadMod(modsFolder, new URL(cmdKeybindURL));
-        }
-        if (installUtil.isOptionalModEnabled(OptionalMod.DISTANT_HORIZONS)) {
-            downloadMod(modsFolder, new URL(distantHorizonsURL));
         }
         if (installUtil.isOptionalModEnabled(OptionalMod.REPLAY_MOD)) {
             downloadMod(modsFolder, new URL(replayModURL));
@@ -289,8 +357,8 @@ public class InstallTask extends SwingWorker<Void, Integer> {
             newEntry.addProperty("type", "custom");
 
             JsonElement element = parser.parse(reader);
-            element.getAsJsonObject().get("profiles").getAsJsonObject().add("BTE Germany", newEntry);
 
+            element.getAsJsonObject().get("profiles").getAsJsonObject().add("BTE Germany", newEntry);
 
             FileWriter writer = new FileWriter(minecraftFolder + fileSeparator + "launcher_profiles.json");
             gson.toJson(element, writer);

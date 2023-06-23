@@ -53,20 +53,18 @@ public class InstallUtil {
     }
 
     public static synchronized void playSound(final String name) {
-        new Thread(new Runnable() {
-            public void run() {
-                try {
-                    ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-                    InputStream is = classloader.getResourceAsStream(name);
-                    Clip clip = AudioSystem.getClip();
-                    AudioInputStream inputStream = AudioSystem.getAudioInputStream(is);
-                    clip.open(inputStream);
-                    FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-                    gainControl.setValue(-30.0f);
-                    clip.start();
-                } catch (Exception e) {
-                    System.err.println(e.getMessage());
-                }
+        new Thread(() -> {
+            try {
+                ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+                InputStream is = classloader.getResourceAsStream(name);
+                Clip clip = AudioSystem.getClip();
+                AudioInputStream inputStream = AudioSystem.getAudioInputStream(is);
+                clip.open(inputStream);
+                FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+                gainControl.setValue(-30.0f);
+                clip.start();
+            } catch (Exception e) {
+                System.err.println(e.getMessage());
             }
         }).start();
     }

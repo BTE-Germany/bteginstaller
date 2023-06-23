@@ -5,19 +5,19 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class MainForm {
-    private JLabel versionText;
     private JButton installModpackButton;
     private JButton selectOptionalModsButton;
     public JPanel MainFormPanel;
     private JComboBox modpackVersionDropDown;
+    private JLabel versionText;
 
     public MainForm(final JFrame frame, final InstallUtil installUtil) {
 
         frame.setResizable(false);
-        String versionNumber = "1.1";
-        versionText.setText("v" + versionNumber);
+       // String versionNumber = "1.1";
+       // versionText.setText("v" + versionNumber);
 
-        modpackVersionDropDown.addItem("1.20 (latest)");
+        modpackVersionDropDown.addItem("1.20.1 (latest)");
         modpackVersionDropDown.addItem("1.19.3");
 
         selectOptionalModsButton.addActionListener(e -> {
