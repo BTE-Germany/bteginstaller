@@ -5,5 +5,7 @@ public enum OptionalMod{
         DISTANT_HORIZONS,
         REPLAY_MOD,
 
+        DOUBLE_HOTBAR,
+
 
 }

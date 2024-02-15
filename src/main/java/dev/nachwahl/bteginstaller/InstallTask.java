@@ -22,6 +22,8 @@ public class InstallTask extends SwingWorker<Void, Integer> {
     String fabricDownloadURL;
     String cmdKeybindURL;
     String replayModURL;
+
+    String doubleHotbarURL;
     String fabricLoaderVersion;
     String bteGermanyModpackVersion;
     InstallUtil installUtil;
@@ -46,6 +48,7 @@ public class InstallTask extends SwingWorker<Void, Integer> {
                 fabricDownloadURL = "https://cdn.bte-germany.de/installer/1.19/fabric.zip";
                 cmdKeybindURL = "https://cdn.modrinth.com/data/h3r1moh7/versions/y3emEjYR/cmdkeybind-1.6.0-1.19.3.jar";
                 replayModURL = "https://cdn.modrinth.com/data/Nv2fQJo5/versions/EcNOFu8c/replaymod-1.19.3-2.6.10.jar";
+                doubleHotbarURL = "https://mediafilez.forgecdn.net/files/4034/709/double_hotbar-1.19-v1.2.3.jar";
                 fabricLoaderVersion = "fabric-loader-0.14.14-1.19.3";
                 bteGermanyModpackVersion = "BTE Germany v1.0";
                 break;
@@ -54,6 +57,7 @@ public class InstallTask extends SwingWorker<Void, Integer> {
                 fabricDownloadURL = "https://cdn.bte-germany.de/installer/1.20.1/fabric.zip";
                 cmdKeybindURL = "https://cdn.modrinth.com/data/h3r1moh7/versions/snLr0hHP/cmdkeybind-1.6.3-1.20.jar";
                 replayModURL = "https://cdn.modrinth.com/data/Nv2fQJo5/versions/akFkhrL8/replaymod-1.20.1-2.6.13.jar";
+                doubleHotbarURL = "https://mediafilez.forgecdn.net/files/4652/544/double_hotbar-1.3.1-mc1.20.1-fabric.jar";
                 fabricLoaderVersion = "fabric-loader-0.14.21-1.20.1";
                 bteGermanyModpackVersion = "BTE Germany v1.1";
                 break;
@@ -258,6 +262,9 @@ public class InstallTask extends SwingWorker<Void, Integer> {
         }
         if (installUtil.isOptionalModEnabled(OptionalMod.REPLAY_MOD)) {
             downloadMod(modsFolder, new URL(replayModURL));
+        }
+        if (InstallUtil.isOptionalModEnabled(OptionalMod.DOUBLE_HOTBAR)) {
+            downloadMod(modsFolder, new URL(doubleHotbarURL));
         }
         return true;
     }

@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class InstallUtil {
-    ArrayList<OptionalMod> optionalMods = new ArrayList<OptionalMod>();
+    static ArrayList<OptionalMod> optionalMods = new ArrayList<OptionalMod>();
     JFrame frame;
 
 
@@ -48,7 +48,7 @@ public class InstallUtil {
         }
     }
 
-    public boolean isOptionalModEnabled(OptionalMod optionalMod){
+    public static boolean isOptionalModEnabled(OptionalMod optionalMod){
         return optionalMods.contains(optionalMod);
     }
 

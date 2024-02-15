@@ -7,8 +7,8 @@ import java.awt.event.ActionListener;
 public class OptionsForm {
     public JPanel OptionFormPanel;
     private JCheckBox commandMacrosCheckBox;
+    private JCheckBox doubleHotbarCheckBox;
     private JButton speichernButton;
-
     private JCheckBox replayModCheckBox;
     private JDialog dialog;
 
@@ -16,6 +16,7 @@ public class OptionsForm {
         this.dialog = dialog;
         commandMacrosCheckBox.setSelected(installUtil.isOptionalModEnabled(OptionalMod.COMMAND_MACROS));
         replayModCheckBox.setSelected(installUtil.isOptionalModEnabled(OptionalMod.REPLAY_MOD));
+        doubleHotbarCheckBox.setSelected(installUtil.isOptionalModEnabled(OptionalMod.DOUBLE_HOTBAR));
         commandMacrosCheckBox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 installUtil.setOptionalMod(OptionalMod.COMMAND_MACROS,commandMacrosCheckBox.isSelected());
@@ -25,6 +26,12 @@ public class OptionsForm {
         replayModCheckBox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 installUtil.setOptionalMod(OptionalMod.REPLAY_MOD,replayModCheckBox.isSelected());
+            }
+        });
+
+        doubleHotbarCheckBox.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                installUtil.setOptionalMod(OptionalMod.DOUBLE_HOTBAR,doubleHotbarCheckBox.isSelected());
             }
         });
 
