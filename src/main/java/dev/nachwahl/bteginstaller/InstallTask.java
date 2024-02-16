@@ -13,6 +13,7 @@ import java.net.URL;
 import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -43,38 +44,23 @@ public class InstallTask extends SwingWorker<Void, Integer> {
 
     @Override
     protected Void doInBackground() {
-        switch (modpackVersion) {
-            case "1.19.3":
-                modpackDownloadURL = "https://cdn.bte-germany.de/installer/1.19/modpack.zip";
-                fabricDownloadURL = "https://cdn.bte-germany.de/installer/1.19/fabric.zip";
 
-                //optional
-                cmdKeybindURL = "https://cdn.modrinth.com/data/h3r1moh7/versions/y3emEjYR/cmdkeybind-1.6.0-1.19.3.jar";
-                replayModURL = "https://cdn.modrinth.com/data/Nv2fQJo5/versions/EcNOFu8c/replaymod-1.19.3-2.6.10.jar";
-                doubleHotbarURL = "https://mediafilez.forgecdn.net/files/4034/709/double_hotbar-1.19-v1.2.3.jar";
-                customCrossairURL = "https://cdn.modrinth.com/data/o1tyE5vJ/versions/gKNFoEVq/custom-crosshair-mod-v1.5.1-fabric-mc1.19.3.jar";
-                skin3dlayersURL = "https://cdn.modrinth.com/data/zV5r3pPn/versions/mF64uUAf/skinlayers3d-fabric-1.6.2-mc1.19.3.jar";
+        for (HashMap<String,String> hm : Installer.modpackData) {
+            if (modpackVersion == hm.get("label")) {
+                modpackDownloadURL = hm.get("modpackDownloadURL");
+                fabricDownloadURL = hm.get("fabricDownloadURL");
 
-                fabricLoaderVersion = "fabric-loader-0.14.14-1.19.3";
-                bteGermanyModpackVersion = "BTE Germany v1.0";
-                break;
-            case "1.20.1 (latest)":
-                modpackDownloadURL = "https://cdn.bte-germany.de/installer/1.20.1/modpack.zip";
-                fabricDownloadURL = "https://cdn.bte-germany.de/installer/1.20.1/fabric.zip";
+                cmdKeybindURL = hm.get("cmdKeybindURL");
+                replayModURL = hm.get("replayModURL");
+                doubleHotbarURL = hm.get("doubleHotbarURL");
+                customCrossairURL = hm.get("customCrosshairURL");
+                skin3dlayersURL = hm.get("skin3dlayersURL");
 
-                //optional
-                cmdKeybindURL = "https://cdn.modrinth.com/data/h3r1moh7/versions/snLr0hHP/cmdkeybind-1.6.3-1.20.jar";
-                replayModURL = "https://cdn.modrinth.com/data/Nv2fQJo5/versions/akFkhrL8/replaymod-1.20.1-2.6.13.jar";
-                doubleHotbarURL = "https://mediafilez.forgecdn.net/files/4652/544/double_hotbar-1.3.1-mc1.20.1-fabric.jar";
-                customCrossairURL = "https://cdn.modrinth.com/data/o1tyE5vJ/versions/GgpTxUYy/custom-crosshair-mod-v1.5.3-fabric-mc1.20.1.jar";
-                skin3dlayersURL = "https://cdn.modrinth.com/data/zV5r3pPn/versions/KHhjRppT/skinlayers3d-fabric-1.6.2-mc1.20.1.jar";
-
-                fabricLoaderVersion = "fabric-loader-0.14.21-1.20.1";
-                bteGermanyModpackVersion = "BTE Germany v1.1";
-                break;
-            default:
-                throw new RuntimeException("Modpack version not supported");
+                fabricLoaderVersion = hm.get("fabricLoaderVersion");
+                bteGermanyModpackVersion = hm.get("bteGermanyModpackVersion");
+            }
         }
+
         fileSeparator = FileSystems.getDefault().getSeparator();
         File installationPath = getMinecraftDir("btegermany").toFile();
         File minecraftPath = getMinecraftDir("minecraft").toFile();

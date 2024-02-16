@@ -3,6 +3,7 @@ package dev.nachwahl.bteginstaller;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.HashMap;
 
 public class MainForm {
     private JButton installModpackButton;
@@ -17,8 +18,10 @@ public class MainForm {
        // String versionNumber = "1.1";
        // versionText.setText("v" + versionNumber);
 
-        modpackVersionDropDown.addItem("1.20.1 (latest)");
-        modpackVersionDropDown.addItem("1.19.3");
+        for (HashMap<String,String> hm : Installer.modpackData) {
+            String label = hm.get("label");
+            modpackVersionDropDown.addItem(label);
+        }
 
         selectOptionalModsButton.addActionListener(e -> {
             JDialog about = new JDialog(frame, "Optionale Mods", true);
