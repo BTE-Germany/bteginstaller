@@ -2,10 +2,10 @@ package dev.nachwahl.bteginstaller;
 
 public enum OptionalMod{
         COMMAND_MACROS,
-        DISTANT_HORIZONS,
         REPLAY_MOD,
-
         DOUBLE_HOTBAR,
+        CUSTOM_CROSSHAIR,
+        SKIN_3DLAYERS,
 
 
 }

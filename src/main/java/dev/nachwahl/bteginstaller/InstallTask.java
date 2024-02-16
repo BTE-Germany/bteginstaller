@@ -22,8 +22,9 @@ public class InstallTask extends SwingWorker<Void, Integer> {
     String fabricDownloadURL;
     String cmdKeybindURL;
     String replayModURL;
-
     String doubleHotbarURL;
+    String customCrossairURL;
+    String skin3dlayersURL;
     String fabricLoaderVersion;
     String bteGermanyModpackVersion;
     InstallUtil installUtil;
@@ -46,18 +47,28 @@ public class InstallTask extends SwingWorker<Void, Integer> {
             case "1.19.3":
                 modpackDownloadURL = "https://cdn.bte-germany.de/installer/1.19/modpack.zip";
                 fabricDownloadURL = "https://cdn.bte-germany.de/installer/1.19/fabric.zip";
+
+                //optional
                 cmdKeybindURL = "https://cdn.modrinth.com/data/h3r1moh7/versions/y3emEjYR/cmdkeybind-1.6.0-1.19.3.jar";
                 replayModURL = "https://cdn.modrinth.com/data/Nv2fQJo5/versions/EcNOFu8c/replaymod-1.19.3-2.6.10.jar";
                 doubleHotbarURL = "https://mediafilez.forgecdn.net/files/4034/709/double_hotbar-1.19-v1.2.3.jar";
+                customCrossairURL = "https://cdn.modrinth.com/data/o1tyE5vJ/versions/gKNFoEVq/custom-crosshair-mod-v1.5.1-fabric-mc1.19.3.jar";
+                skin3dlayersURL = "https://cdn.modrinth.com/data/zV5r3pPn/versions/mF64uUAf/skinlayers3d-fabric-1.6.2-mc1.19.3.jar";
+
                 fabricLoaderVersion = "fabric-loader-0.14.14-1.19.3";
                 bteGermanyModpackVersion = "BTE Germany v1.0";
                 break;
             case "1.20.1 (latest)":
                 modpackDownloadURL = "https://cdn.bte-germany.de/installer/1.20.1/modpack.zip";
                 fabricDownloadURL = "https://cdn.bte-germany.de/installer/1.20.1/fabric.zip";
+
+                //optional
                 cmdKeybindURL = "https://cdn.modrinth.com/data/h3r1moh7/versions/snLr0hHP/cmdkeybind-1.6.3-1.20.jar";
                 replayModURL = "https://cdn.modrinth.com/data/Nv2fQJo5/versions/akFkhrL8/replaymod-1.20.1-2.6.13.jar";
                 doubleHotbarURL = "https://mediafilez.forgecdn.net/files/4652/544/double_hotbar-1.3.1-mc1.20.1-fabric.jar";
+                customCrossairURL = "https://cdn.modrinth.com/data/o1tyE5vJ/versions/GgpTxUYy/custom-crosshair-mod-v1.5.3-fabric-mc1.20.1.jar";
+                skin3dlayersURL = "https://cdn.modrinth.com/data/zV5r3pPn/versions/KHhjRppT/skinlayers3d-fabric-1.6.2-mc1.20.1.jar";
+
                 fabricLoaderVersion = "fabric-loader-0.14.21-1.20.1";
                 bteGermanyModpackVersion = "BTE Germany v1.1";
                 break;
@@ -265,6 +276,12 @@ public class InstallTask extends SwingWorker<Void, Integer> {
         }
         if (InstallUtil.isOptionalModEnabled(OptionalMod.DOUBLE_HOTBAR)) {
             downloadMod(modsFolder, new URL(doubleHotbarURL));
+        }
+        if (InstallUtil.isOptionalModEnabled(OptionalMod.CUSTOM_CROSSHAIR)) {
+            downloadMod(modsFolder, new URL(customCrossairURL));
+        }
+        if (InstallUtil.isOptionalModEnabled(OptionalMod.SKIN_3DLAYERS)) {
+            downloadMod(modsFolder, new URL(skin3dlayersURL));
         }
         return true;
     }
