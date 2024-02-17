@@ -11,10 +11,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.*;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Locale;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
@@ -26,6 +23,7 @@ public class InstallTask extends SwingWorker<Void, Integer> {
     String doubleHotbarURL;
     String customCrossairURL;
     String skin3dlayersURL;
+    String clothConfigURL;
     String fabricLoaderVersion;
     String bteGermanyModpackVersion;
     InstallUtil installUtil;
@@ -55,6 +53,7 @@ public class InstallTask extends SwingWorker<Void, Integer> {
                 doubleHotbarURL = hm.get("doubleHotbarURL");
                 customCrossairURL = hm.get("customCrosshairURL");
                 skin3dlayersURL = hm.get("skin3dlayersURL");
+                clothConfigURL = hm.get("clothConfigURL");
 
                 fabricLoaderVersion = hm.get("fabricLoaderVersion");
                 bteGermanyModpackVersion = hm.get("bteGermanyModpackVersion");
@@ -186,7 +185,6 @@ public class InstallTask extends SwingWorker<Void, Integer> {
             }
             zipEntry = zis.getNextEntry();
         }
-
         zis.closeEntry();
         zis.close();
         System.out.println("Modpack extraction complete.");
@@ -262,6 +260,7 @@ public class InstallTask extends SwingWorker<Void, Integer> {
         }
         if (InstallUtil.isOptionalModEnabled(OptionalMod.DOUBLE_HOTBAR)) {
             downloadMod(modsFolder, new URL(doubleHotbarURL));
+            if (modpackVersion == "1.19.3") downloadMod(modsFolder, new URL(clothConfigURL));
         }
         if (InstallUtil.isOptionalModEnabled(OptionalMod.CUSTOM_CROSSHAIR)) {
             downloadMod(modsFolder, new URL(customCrossairURL));

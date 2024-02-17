@@ -113,11 +113,14 @@ public class Installer {
         mp.put("customCrosshairURL", customCrosshairURL);
         String skin3dlayersURL = (String) mpObject.get("skin3dlayersURL").getAsString();
         mp.put("skin3dlayersURL", skin3dlayersURL);
+        String clothConfigURL = (String) mpObject.get("clothConfigURL").getAsString();
+        mp.put("clothConfigURL", clothConfigURL);
         String fabricLoaderVersion = (String) mpObject.get("fabricLoaderVersion").getAsString();
         mp.put("fabricLoaderVersion", fabricLoaderVersion);
         String modpackVersion = (String) mpObject.get("bteGermanyModpackVersion").getAsString();
         mp.put("bteGermanyModpackVersion", modpackVersion);
         mp.put("modpackIndex", String.valueOf(modpackCount));
+
 
         modpackData.add(mp);
 
