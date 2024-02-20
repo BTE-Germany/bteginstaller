@@ -9,19 +9,18 @@ import javax.swing.*;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import java.awt.*;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.*;
 import java.util.List;
 
 public class Installer {
     private static int modpackCount = 0;
     public static List<HashMap<String, String>> modpackData = new ArrayList<HashMap<String, String>>();
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
         FlatOneDarkIJTheme.install(new FlatOneDarkIJTheme());
         final JFrame frame = new JFrame("BTE Germany Installer");
@@ -31,7 +30,7 @@ public class Installer {
             e.printStackTrace();
         }
 
-        downloadLatestConfig();
+        downloadLatestConfig("https://cms.bte-germany.de/items/modpack");
         Collections.reverse(modpackData);
 
         InstallUtil installUtil = new InstallUtil(frame);
@@ -73,58 +72,55 @@ public class Installer {
 
         frame.setVisible(true);
     }
-    private static void downloadLatestConfig() {
-        JsonParser jsonParser = new JsonParser();
-
-        try (FileReader reader = new FileReader("C:/Users/hugoh/Desktop/modpack.json")) {
-            Gson gson = new Gson();
-            JsonParser parser = new JsonParser();
-            JsonElement jel = parser.parse(reader);
-            JsonArray instances = jel.getAsJsonObject().get("instances").getAsJsonArray();
-
-            instances.forEach(jsonElement ->  parseModpackObject((JsonObject) jsonElement));
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    private static void downloadLatestConfig(String url) throws IOException {
+        JsonObject root = readJsonFromUrl(url);
+        root.getAsJsonArray().forEach(jsonElement -> parseModpackObject(jsonElement.getAsJsonObject()));
     }
 
     private static void parseModpackObject(JsonObject modpack) {
         HashMap<String,String> mp = new HashMap<String,String>();
 
-        JsonObject mpObject = (JsonObject) modpack.get("modpack");
+        String id = String.valueOf(modpack.get("id").getAsInt());
+        String label = modpack.get("label").getAsString();
+        String modpackURL = modpack.get("modpackDownloadURL").getAsString();
+        String fabricURL = modpack.get("fabricDownloadURL").getAsString();
+        String fabricVersion = modpack.get("fabricLoaderVersion").getAsString();
+        String bteVersion = modpack.get("bteGermanyModpackVersion").getAsString();
+        JsonArray optionalMods = modpack.get("optionalMods").getAsJsonArray();
+        JsonArray optionalShaders = modpack.get("optionalMods").getAsJsonArray();
 
-        String label = (String) mpObject.get("label").getAsString();
-
-        mp.put("label", label);
-        String modpackURL = (String) mpObject.get("modpackDownloadURL").getAsString();
-        mp.put("modpackDownloadURL", modpackURL);
-        String fabricURL = (String) mpObject.get("fabricDownloadURL").getAsString();
-        mp.put("fabricDownloadURL", fabricURL);
-        String cmdKeybindURL = (String) mpObject.get("cmdKeybindURL").getAsString();
-        mp.put("cmdKeybindURL", cmdKeybindURL);
-        String replayModURL = (String) mpObject.get("replayModURL").getAsString();
-        mp.put("replayModURL", replayModURL);
-        String doubleHotbarURL = (String) mpObject.get("doubleHotbarURL").getAsString();
-        mp.put("doubleHotbarURL", doubleHotbarURL);
-        String customCrosshairURL = (String) mpObject.get("customCrosshairURL").getAsString();
-        mp.put("customCrosshairURL", customCrosshairURL);
-        String skin3dlayersURL = (String) mpObject.get("skin3dlayersURL").getAsString();
-        mp.put("skin3dlayersURL", skin3dlayersURL);
-        String clothConfigURL = (String) mpObject.get("clothConfigURL").getAsString();
-        mp.put("clothConfigURL", clothConfigURL);
-        String fabricLoaderVersion = (String) mpObject.get("fabricLoaderVersion").getAsString();
-        mp.put("fabricLoaderVersion", fabricLoaderVersion);
-        String modpackVersion = (String) mpObject.get("bteGermanyModpackVersion").getAsString();
-        mp.put("bteGermanyModpackVersion", modpackVersion);
-        mp.put("modpackIndex", String.valueOf(modpackCount));
-
-
-        modpackData.add(mp);
+        mp.put("id", id);
+        mp.put("label" ,label);
+        mp.put("modpackURL", modpackURL);
+        mp.put("fabricURL", fabricURL);
+        mp.put("fabricVersion", fabricVersion);
+        mp.put("bteVersion", bteVersion);
+        mp.put("optionalMods", optionalMods.getAsString());
+        mp.put("optionalShaders", optionalShaders.getAsString());
 
         modpackCount = modpackCount + 1;
     }
+
+    private static String readAll(Reader rd) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        int cp;
+        while ((cp = rd.read()) != -1) {
+            sb.append((char) cp);
+        }
+        return sb.toString();
+    }
+
+    public static JsonObject readJsonFromUrl(String url) throws IOException {
+        InputStream is = new URL(url).openStream();
+        try {
+            BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+            String jsonText = readAll(rd);
+            JsonObject json = JsonParser.parseString(jsonText).getAsJsonObject();
+            return json;
+        } finally {
+            is.close();
+        }
+    }
+
 }
 

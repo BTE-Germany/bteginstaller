@@ -43,22 +43,7 @@ public class InstallTask extends SwingWorker<Void, Integer> {
     @Override
     protected Void doInBackground() {
 
-        for (HashMap<String,String> hm : Installer.modpackData) {
-            if (modpackVersion == hm.get("label")) {
-                modpackDownloadURL = hm.get("modpackDownloadURL");
-                fabricDownloadURL = hm.get("fabricDownloadURL");
 
-                cmdKeybindURL = hm.get("cmdKeybindURL");
-                replayModURL = hm.get("replayModURL");
-                doubleHotbarURL = hm.get("doubleHotbarURL");
-                customCrossairURL = hm.get("customCrosshairURL");
-                skin3dlayersURL = hm.get("skin3dlayersURL");
-                clothConfigURL = hm.get("clothConfigURL");
-
-                fabricLoaderVersion = hm.get("fabricLoaderVersion");
-                bteGermanyModpackVersion = hm.get("bteGermanyModpackVersion");
-            }
-        }
 
         fileSeparator = FileSystems.getDefault().getSeparator();
         File installationPath = getMinecraftDir("btegermany").toFile();
@@ -70,25 +55,37 @@ public class InstallTask extends SwingWorker<Void, Integer> {
         try {
             // MODPACK
             deleteOldFiles(installationPath);
+            System.out.println("Deleted old files");
             downloadModpack(modpackDownloadURL, installationPath);
+            System.out.println("Downloaded modpack");
             unzipModpack(installationPath);
+            System.out.println("Unpacked modpack");
             //unzipFile(Paths.get(new File(installationPath.getAbsolutePath() + fileSeparator + "modpack.zip").getPath()));
             File modpackArchive = new File(installationPath.getAbsolutePath() + fileSeparator + "modpack.zip");
             modpackArchive.delete();
+            System.out.println("Deleted modpackArchive");
             downloadOptionalMods(installationPath + fileSeparator + "mods" + fileSeparator);
+            System.out.println("Downloaded optional mods");
 
             // FABRIC
             downloadFabric(minecraftPath.getAbsolutePath().toString(), new URL(fabricDownloadURL));
+            System.out.println("Downloaded fabric");
             //unzipFile(Paths.get(new File(minecraftPath.getAbsolutePath() + fileSeparator + "versions"+ fileSeparator + "fabric.zip").getPath()));
             unzipFabric(minecraftPath);
+            System.out.println("Unpacked fabric");
             File fabricArchive = new File(minecraftPath.getAbsolutePath() + fileSeparator + "versions"+ fileSeparator + "version.zip");
             fabricArchive.delete();
+            System.out.println("Deleted fabricArchive");
             editLauncherProfiles(minecraftPath, installationPath);
+            System.out.println("Edited launcher profiles");
 
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
+        System.out.println("returned null");
         return null;
     }
 
@@ -116,7 +113,6 @@ public class InstallTask extends SwingWorker<Void, Integer> {
         ArrayList<File> files = new ArrayList<>();
         files.add(new File(installationPath.getAbsolutePath() + fileSeparator + "config"));
         files.add(new File(installationPath.getAbsolutePath() + fileSeparator + "fancymenu_data"));
-        files.add(new File(installationPath.getAbsolutePath() + fileSeparator + "fancymenu_setups"));
         files.add(new File(installationPath.getAbsolutePath() + fileSeparator + "mods"));
         files.add(new File(installationPath.getAbsolutePath() + fileSeparator + "resources"));
         for (File file : files) {
@@ -152,11 +148,14 @@ public class InstallTask extends SwingWorker<Void, Integer> {
         return true;
     }
 
-    private boolean unzipModpack(File installationPath) throws IOException {
+    private boolean unzipModpack(File installationPath) throws IOException, InterruptedException {
+        progessLabel.setText("Entpacke Modpack...");
+        progressBar.setValue(0);
         System.out.println("Entpacke Modpack...");
         ZipInputStream zis = new ZipInputStream(new FileInputStream(installationPath.getAbsolutePath() + fileSeparator + "modpack.zip"));
         ZipEntry zipEntry = zis.getNextEntry();
         long fileSize = zipEntry.getCompressedSize();
+        FileOutputStream fos = null;
 
         while (zipEntry != null) {
             String fileName = zipEntry.getName();
@@ -169,26 +168,35 @@ public class InstallTask extends SwingWorker<Void, Integer> {
                     file.mkdir();
                     System.out.println("Created directory: " + filePath);
                 } else {
+                    File parent = file.getParentFile();
+                    if (!parent.isDirectory() && !parent.mkdirs()) {
+                        throw new IOException("Failed to create directory " + parent);
+                    }
                     long zipFileSize = 0;
 
-                    FileOutputStream fos = new FileOutputStream(filePath);
+                    fos = new FileOutputStream(filePath);
                     byte[] buffer = new byte[1024];
                     int bytesRead;
                     while ((bytesRead = zis.read(buffer)) != -1) {
                         fos.write(buffer, 0, bytesRead);
                         zipFileSize++;
-                        progressBar.setValue((int) ((((double) zipFileSize) / ((double) fileSize)) * 100000d));
+                        int value = (int) ((((double) zipFileSize) / ((double) fileSize)) * 100000d);
+                        progressBar.setValue(value);
                     }
-                    fos.close();
                     System.out.println("Extracted file: " + filePath);
                 }
             }
             zipEntry = zis.getNextEntry();
         }
+        fos.close();
+        System.out.println("Modpack extraction complete, closing...");
         zis.closeEntry();
+        System.out.println("Closed entry");
         zis.close();
-        System.out.println("Modpack extraction complete.");
+        System.out.println("Closed inputSteam");
         return true;
+
+    }
 /*
 
         System.out.println("Entpacke Modpack...");
@@ -201,7 +209,7 @@ public class InstallTask extends SwingWorker<Void, Integer> {
         return true;
 
          */
-    }
+
     /*
     private static void unzipFile(Path filePathToUnzip) {
 
@@ -260,7 +268,7 @@ public class InstallTask extends SwingWorker<Void, Integer> {
         }
         if (InstallUtil.isOptionalModEnabled(OptionalMod.DOUBLE_HOTBAR)) {
             downloadMod(modsFolder, new URL(doubleHotbarURL));
-            if (modpackVersion == "1.19.3") downloadMod(modsFolder, new URL(clothConfigURL));
+            if (modpackVersion == "1.19.3") downloadMod(modsFolder, new URL("https://cdn.modrinth.com/data/9s6osm5g/versions/w2VZSLTf/cloth-config-9.1.104-fabric.jar"));
         }
         if (InstallUtil.isOptionalModEnabled(OptionalMod.CUSTOM_CROSSHAIR)) {
             downloadMod(modsFolder, new URL(customCrossairURL));
