@@ -17,39 +17,11 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class InstallUtil {
-    static ArrayList<OptionalMod> optionalMods = new ArrayList<OptionalMod>();
     JFrame frame;
-
 
     public InstallUtil(JFrame frame) {
         this.frame = frame;
         System.out.println("Init InstallUtil");
-    }
-
-
-
-    public void removeOptionalMod(OptionalMod optionalMod) {
-        if(optionalMods.contains(optionalMod)) {
-            optionalMods.remove(optionalMod);
-        }
-    }
-
-    public void addOptionalMod(OptionalMod optionalMod) {
-        if(!optionalMods.contains(optionalMod)) {
-            optionalMods.add(optionalMod);
-        }
-    }
-
-    public void setOptionalMod(OptionalMod optionalMod, boolean active){
-        if(active){
-            addOptionalMod(optionalMod);
-        }else{
-            removeOptionalMod(optionalMod);
-        }
-    }
-
-    public static boolean isOptionalModEnabled(OptionalMod optionalMod){
-        return optionalMods.contains(optionalMod);
     }
 
     public static synchronized void playSound(final String name) {

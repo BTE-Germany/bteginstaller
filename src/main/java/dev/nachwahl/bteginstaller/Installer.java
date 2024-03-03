@@ -1,7 +1,6 @@
 package dev.nachwahl.bteginstaller;
 
 import com.formdev.flatlaf.intellijthemes.FlatOneDarkIJTheme;
-import com.formdev.flatlaf.json.Json;
 import com.google.gson.*;
 
 import javax.imageio.ImageIO;
@@ -19,7 +18,8 @@ import java.util.List;
 
 public class Installer {
     private static int modpackCount = 0;
-    public static List<HashMap<String, String>> modpackData = new ArrayList<HashMap<String, String>>();
+    public static List<Modpack> modpacks = new ArrayList<Modpack>();
+
     public static void main(String[] args) throws IOException {
 
         FlatOneDarkIJTheme.install(new FlatOneDarkIJTheme());
@@ -31,7 +31,7 @@ public class Installer {
         }
 
         downloadLatestConfig("https://cms.bte-germany.de/items/modpack");
-        Collections.reverse(modpackData);
+        Collections.reverse(modpacks);
 
         InstallUtil installUtil = new InstallUtil(frame);
         frame.setContentPane(new MainForm(frame, installUtil).MainFormPanel);
@@ -73,32 +73,40 @@ public class Installer {
         frame.setVisible(true);
     }
     private static void downloadLatestConfig(String url) throws IOException {
-        JsonObject root = readJsonFromUrl(url);
-        root.getAsJsonArray().forEach(jsonElement -> parseModpackObject(jsonElement.getAsJsonObject()));
+        JsonArray root = readJsonFromUrl(url).get("data").getAsJsonArray();
+        root.forEach(jsonElement -> parseModpackObject(jsonElement.getAsJsonObject()));
     }
 
     private static void parseModpackObject(JsonObject modpack) {
-        HashMap<String,String> mp = new HashMap<String,String>();
-
-        String id = String.valueOf(modpack.get("id").getAsInt());
+        String id = modpack.get("id").getAsString();
         String label = modpack.get("label").getAsString();
         String modpackURL = modpack.get("modpackDownloadURL").getAsString();
         String fabricURL = modpack.get("fabricDownloadURL").getAsString();
         String fabricVersion = modpack.get("fabricLoaderVersion").getAsString();
         String bteVersion = modpack.get("bteGermanyModpackVersion").getAsString();
-        JsonArray optionalMods = modpack.get("optionalMods").getAsJsonArray();
-        JsonArray optionalShaders = modpack.get("optionalMods").getAsJsonArray();
 
-        mp.put("id", id);
-        mp.put("label" ,label);
-        mp.put("modpackURL", modpackURL);
-        mp.put("fabricURL", fabricURL);
-        mp.put("fabricVersion", fabricVersion);
-        mp.put("bteVersion", bteVersion);
-        mp.put("optionalMods", optionalMods.getAsString());
-        mp.put("optionalShaders", optionalShaders.getAsString());
+        List<HashMap<String, String>> optionalMods = new ArrayList<>();
+        modpack.get("optionalMods").getAsJsonArray().forEach(modElement -> {
+            HashMap<String, String> mod = new HashMap<>();
+            mod.put("label", modElement.getAsJsonObject().get("label").getAsString());
+            mod.put("desc", modElement.getAsJsonObject().get("desc").getAsString());
+            mod.put("url", modElement.getAsJsonObject().get("url").getAsString());
+            mod.put("on", "false");
+            optionalMods.add(mod);
+        });
 
-        modpackCount = modpackCount + 1;
+        List<HashMap<String, String>> optionalShaders = new ArrayList<>();
+        modpack.get("optionalShaders").getAsJsonArray().forEach(shaderElement -> {
+            HashMap<String, String> shader = new HashMap<>();
+            shader.put("label", shaderElement.getAsJsonObject().get("label").getAsString());
+            shader.put("url", shaderElement.getAsJsonObject().get("url").getAsString());
+            shader.put("on", "false");
+            optionalShaders.add(shader);
+        });
+
+        BTEmodpack fin = new BTEmodpack(id, label, modpackURL, fabricURL, fabricVersion, bteVersion, optionalMods, optionalShaders);
+
+        modpacks.add(fin);
     }
 
     private static String readAll(Reader rd) throws IOException {

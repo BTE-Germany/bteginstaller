@@ -18,12 +18,6 @@ import java.util.zip.ZipInputStream;
 public class InstallTask extends SwingWorker<Void, Integer> {
     String modpackDownloadURL;
     String fabricDownloadURL;
-    String cmdKeybindURL;
-    String replayModURL;
-    String doubleHotbarURL;
-    String customCrossairURL;
-    String skin3dlayersURL;
-    String clothConfigURL;
     String fabricLoaderVersion;
     String bteGermanyModpackVersion;
     InstallUtil installUtil;
@@ -41,9 +35,16 @@ public class InstallTask extends SwingWorker<Void, Integer> {
     }
 
     @Override
-    protected Void doInBackground() {
+    protected Void doInBackground() throws InterruptedException {
 
-
+        for (Modpack m : Installer.modpacks) {
+            if (m.getLabel().equals(modpackVersion)) {
+                modpackDownloadURL = m.getModpackURL();
+                fabricDownloadURL = m.getFabricURL();
+                fabricLoaderVersion = m.getFabricVersion();
+                bteGermanyModpackVersion = m.getBteVersion();
+            }
+        }
 
         fileSeparator = FileSystems.getDefault().getSeparator();
         File installationPath = getMinecraftDir("btegermany").toFile();
@@ -66,6 +67,10 @@ public class InstallTask extends SwingWorker<Void, Integer> {
             System.out.println("Deleted modpackArchive");
             downloadOptionalMods(installationPath + fileSeparator + "mods" + fileSeparator);
             System.out.println("Downloaded optional mods");
+            createShaderpacksFolder(installationPath.getAbsolutePath());
+            System.out.println("Created shaderpacks folder");
+            downloadOptionalShaders(installationPath.getAbsolutePath() + fileSeparator + "shaderpacks" + fileSeparator);
+            System.out.println("Downloaded optional shaders");
 
             // FABRIC
             downloadFabric(minecraftPath.getAbsolutePath().toString(), new URL(fabricDownloadURL));
@@ -85,7 +90,6 @@ public class InstallTask extends SwingWorker<Void, Integer> {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        System.out.println("returned null");
         return null;
     }
 
@@ -115,6 +119,7 @@ public class InstallTask extends SwingWorker<Void, Integer> {
         files.add(new File(installationPath.getAbsolutePath() + fileSeparator + "fancymenu_data"));
         files.add(new File(installationPath.getAbsolutePath() + fileSeparator + "mods"));
         files.add(new File(installationPath.getAbsolutePath() + fileSeparator + "resources"));
+        files.add(new File(installationPath.getAbsolutePath() + fileSeparator + "shaderpacks"));
         for (File file : files) {
             if (file.isDirectory()) {
                 try {
@@ -260,21 +265,42 @@ public class InstallTask extends SwingWorker<Void, Integer> {
      */
 
     private boolean downloadOptionalMods(String modsFolder) throws IOException {
-        if (installUtil.isOptionalModEnabled(OptionalMod.COMMAND_MACROS)) {
-            downloadMod(modsFolder, new URL(cmdKeybindURL));
+        for (Modpack m : Installer.modpacks) {
+            if (m.getLabel().equals(modpackVersion)) {
+                for (HashMap<String, String> mod : m.getOptionalMods()) {
+                    if (mod.get("on").equals("true")) {
+                        downloadMod(modsFolder, new URL(mod.get("url")));
+                    }
+                }
+            }
         }
-        if (installUtil.isOptionalModEnabled(OptionalMod.REPLAY_MOD)) {
-            downloadMod(modsFolder, new URL(replayModURL));
+        return true;
+    }
+
+    private boolean createShaderpacksFolder(String iPath) {
+        File folder = new File(iPath + fileSeparator + "shaderpacks");
+
+        if (!folder.exists()) {
+            if (folder.mkdirs()) {
+                System.out.println("Ordner wurde erfolgreich erstellt.");
+            } else {
+                System.out.println("Ordner konnte nicht erstellt werden.");
+            }
+        } else {
+            System.out.println("Ordner existiert bereits.");
         }
-        if (InstallUtil.isOptionalModEnabled(OptionalMod.DOUBLE_HOTBAR)) {
-            downloadMod(modsFolder, new URL(doubleHotbarURL));
-            if (modpackVersion == "1.19.3") downloadMod(modsFolder, new URL("https://cdn.modrinth.com/data/9s6osm5g/versions/w2VZSLTf/cloth-config-9.1.104-fabric.jar"));
-        }
-        if (InstallUtil.isOptionalModEnabled(OptionalMod.CUSTOM_CROSSHAIR)) {
-            downloadMod(modsFolder, new URL(customCrossairURL));
-        }
-        if (InstallUtil.isOptionalModEnabled(OptionalMod.SKIN_3DLAYERS)) {
-            downloadMod(modsFolder, new URL(skin3dlayersURL));
+        return true;
+    }
+
+    private boolean downloadOptionalShaders(String shadersFolder) throws IOException {
+        for (Modpack m : Installer.modpacks) {
+            if (m.getLabel().equals(modpackVersion)) {
+                for (HashMap<String, String> shader : m.getOptionalShaders()) {
+                    if (shader.get("on").equals("true")) {
+                        downloadShader(shadersFolder, new URL(shader.get("url")));
+                    }
+                }
+            }
         }
         return true;
     }
@@ -289,6 +315,28 @@ public class InstallTask extends SwingWorker<Void, Integer> {
         progessLabel.setText("Downloade " + modName + "...");
         BufferedInputStream in = new BufferedInputStream(httpURLConnection.getInputStream());
         BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(modsFolder + fileSeparator + modName), 1024);
+        byte[] buffer = new byte[1024];
+        int bytesRead;
+        while ((bytesRead = in.read(buffer)) != -1) {
+            out.write(buffer, 0, bytesRead);
+            downloadedFileSize++;
+            progressBar.setValue((int) ((((double) downloadedFileSize) / ((double) fileSize)) * 100000d));
+        }
+        in.close();
+        out.close();
+        return true;
+    }
+
+    private boolean downloadShader(String shaderFolder, URL url) throws IOException {
+        HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+        httpURLConnection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36");
+        long fileSize = httpURLConnection.getContentLength();
+        long downloadedFileSize = 0;
+        String shaderName = new File(url.getPath().toString()).getName();
+
+        progessLabel.setText("Downloade " + shaderName + "...");
+        BufferedInputStream in = new BufferedInputStream(httpURLConnection.getInputStream());
+        BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(shaderFolder + fileSeparator + shaderName), 1024);
         byte[] buffer = new byte[1024];
         int bytesRead;
         while ((bytesRead = in.read(buffer)) != -1) {

@@ -5,15 +5,13 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
-import java.util.List;
 
-public class OptionsForm {
-    public JPanel OptionFormPanel;
-    private JButton speichernButton;
+public class ShadersForm {
     private JPanel DATA;
+    private JButton speichernButton;
+    JPanel ShaderFormPanel;
     private JDialog dialog;
-
-    public OptionsForm(JDialog dialog,final InstallUtil installUtil) {
+    public ShadersForm(JDialog dialog,final InstallUtil installUtil) {
         this.dialog = dialog;
 
         DATA.setLayout(new GridBagLayout());
@@ -25,16 +23,14 @@ public class OptionsForm {
 
         for (Modpack m : Installer.modpacks) {
             if (m.getLabel().equals(MainForm.selectedItem)) {
-                for (int i = 0; i < m.getOptionalMods().size(); i++) {
-                    HashMap<String, String> hm = m.getOptionalMods().get(i);
-                    JCheckBox checkbox = new JCheckBox();
-                    checkbox.setName(hm.get("label"));
-                    checkbox.setText(hm.get("label") + " | " + hm.get("desc"));
-                    checkbox.setSelected("true".equals(hm.get("enabled")));
-
+                for (int i = 0; i < m.getOptionalShaders().size(); i++) {
+                    HashMap<String, String> hm = m.getOptionalShaders().get(i);
+                    JCheckBox checkbox = new JCheckBox(hm.get("label"));
+                    checkbox.setSelected("true".equals(hm.get("on")));
                     checkbox.addActionListener(e -> hm.put("on", checkbox.isSelected() ? "true" : "false"));
 
-                    if (i < hm.size() - 1) {
+                    // Für alle Elemente außer dem letzten, setzen Sie weighty = 0
+                    if (i < m.getOptionalShaders().size() - 1) {
                         gbc.weighty = 0;
                     }
 
@@ -44,11 +40,12 @@ public class OptionsForm {
             }
         }
 
-        speichernButton.addActionListener(e -> {
-            dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-            dialog.dispose();
+
+        speichernButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+                dialog.dispose();
+            }
         });
-
     }
-
 }
