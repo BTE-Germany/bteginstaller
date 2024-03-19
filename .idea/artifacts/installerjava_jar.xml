@@ -1,0 +1,16 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="installerjava:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/installerjava_jar</output-path>
+    <root id="archive" name="installerjava.jar">
+      <element id="module-output" name="installerjava" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/formdev/flatlaf-intellij-themes/3.0/flatlaf-intellij-themes-3.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/de/schlichtherle/truezip/truezip-file/7.7.9/truezip-file-7.7.9.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/de/schlichtherle/truezip/truezip-kernel/7.7.9/truezip-kernel-7.7.9.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/google/code/gson/gson/2.8.7/gson-2.8.7.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/de/schlichtherle/truezip/truezip-driver-file/7.7.9/truezip-driver-file-7.7.9.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/commons-io/commons-io/2.12.0/commons-io-2.12.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/google/code/findbugs/annotations/3.0.0/annotations-3.0.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/formdev/flatlaf/1.1.1/flatlaf-1.1.1.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
