@@ -96,9 +96,15 @@ public class InstallTask extends SwingWorker<Void, Integer> {
     @Override
     public void done() {
         InstallUtil.playSound("notification.wav");
-        progressDialog.setTitle("Installation/Update abgeschlossen");
-        progessLabel.setText("Installation/Update abgeschlossen");
-        progressBar.setValue(100);
+        progressDialog.dispose();
+        JDialog finish = new JDialog(Installer.pframe, "Installation/Update abgeschlossen", true);
+        finish.setContentPane(new FinishForm(installUtil, Installer.pframe, finish).FinishForm);
+        finish.setResizable(false);
+        finish.setSize(500, 150);
+        finish.setLocationRelativeTo(null);
+        finish.setVisible(true);
+        finish.toFront();
+        finish.repaint();
     }
 
     private static Path getMinecraftDir(String mcFolderNanme) {
@@ -385,7 +391,7 @@ public class InstallTask extends SwingWorker<Void, Integer> {
                     dir.mkdir();
                 } else {
                     long zipFileSize = 0;
-
+                    System.out.println(filePath);
                     FileOutputStream fos = new FileOutputStream(filePath);
                     byte[] buffer = new byte[1024];
                     int bytesRead;

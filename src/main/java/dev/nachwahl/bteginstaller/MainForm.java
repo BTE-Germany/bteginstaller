@@ -12,9 +12,7 @@ public class MainForm {
     private JComboBox modpackVersionDropDown;
     private JLabel versionText;
     private JButton selectOptionalShadersButton;
-
     public static String selectedItem;
-
 
     public MainForm(final JFrame frame, final InstallUtil installUtil) {
 
@@ -56,7 +54,7 @@ public class MainForm {
         installModpackButton.addActionListener(e -> {
             String modpackVersion = modpackVersionDropDown.getSelectedItem().toString();
             JDialog loading = new JDialog(frame, "Installiere...", true);
-            loading.setContentPane(new LoadingForm(installUtil, frame, loading,modpackVersion).LoadingForm);
+            loading.setContentPane(new LoadingForm(installUtil, frame, loading, modpackVersion).LoadingForm);
             loading.setResizable(false);
             loading.setSize(500, 150);
             loading.setLocationRelativeTo(null);

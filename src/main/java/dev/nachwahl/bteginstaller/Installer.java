@@ -19,11 +19,13 @@ import java.util.List;
 public class Installer {
     private static int modpackCount = 0;
     public static List<Modpack> modpacks = new ArrayList<Modpack>();
+    public static JFrame pframe = null;
 
     public static void main(String[] args) throws IOException {
 
         FlatOneDarkIJTheme.install(new FlatOneDarkIJTheme());
         final JFrame frame = new JFrame("BTE Germany Installer");
+        pframe = frame;
         try {
             frame.setIconImage(ImageIO.read(MainForm.class.getResourceAsStream("/logo.png")));
         } catch (IOException e) {

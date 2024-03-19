@@ -2,10 +2,7 @@ package dev.nachwahl.bteginstaller;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.HashMap;
-import java.util.List;
 
 public class OptionsForm {
     public JPanel OptionFormPanel;
@@ -13,15 +10,16 @@ public class OptionsForm {
     private JPanel DATA;
     private JDialog dialog;
 
-    public OptionsForm(JDialog dialog,final InstallUtil installUtil) {
+    public OptionsForm(JDialog dialog, final InstallUtil installUtil) {
         this.dialog = dialog;
 
-        DATA.setLayout(new GridBagLayout());
+        DATA.setLayout(new BorderLayout()); // Setzt das Hauptlayout zu BorderLayout
+
+        JPanel centerPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridwidth = GridBagConstraints.REMAINDER; // Endet die Zeile
+        gbc.gridwidth = GridBagConstraints.REMAINDER; // Beendet die Zeile
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1; // Verteilt den zusätzlichen horizontalen Raum
-        gbc.weighty = 1;
 
         for (Modpack m : Installer.modpacks) {
             if (m.getLabel().equals(MainForm.selectedItem)) {
@@ -29,26 +27,34 @@ public class OptionsForm {
                     HashMap<String, String> hm = m.getOptionalMods().get(i);
                     JCheckBox checkbox = new JCheckBox();
                     checkbox.setName(hm.get("label"));
-                    checkbox.setText(hm.get("label") + " | " + hm.get("desc"));
-                    checkbox.setSelected("true".equals(hm.get("enabled")));
-
+                    checkbox.setText(hm.get("label"));
+                    checkbox.setSelected("true".equals(hm.get("on")));
                     checkbox.addActionListener(e -> hm.put("on", checkbox.isSelected() ? "true" : "false"));
 
-                    if (i < hm.size() - 1) {
-                        gbc.weighty = 0;
-                    }
+                    JPanel modPanel = new JPanel();
+                    modPanel.setLayout(new BoxLayout(modPanel, BoxLayout.Y_AXIS));
+                    modPanel.add(checkbox);
 
-                    DATA.add(checkbox, gbc);
+                    // Beschreibung in kleinerer und kursiver Schrift
+                    JLabel descriptionLabel = new JLabel("       " + hm.get("desc"));
+                    Font currentFont = descriptionLabel.getFont();
+                    descriptionLabel.setFont(currentFont.deriveFont(Font.ITALIC, currentFont.getSize() - 2f));
+                    modPanel.add(descriptionLabel);
+
+                    centerPanel.add(modPanel, gbc);
                 }
-
             }
         }
+
+        gbc.weighty = 1;  // Wichtig, um zu gewährleisten, dass Komponenten oben starten und der Platz unten bleibt
+        centerPanel.add(Box.createGlue(), gbc); // Fügt den Klebstoff hinzu, um den Inhalt zu zentrieren
+
+        DATA.add(centerPanel, BorderLayout.CENTER); // Fügt das centerPanel in der Mitte hinzu
 
         speichernButton.addActionListener(e -> {
             dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
             dialog.dispose();
         });
-
     }
-
 }
+
