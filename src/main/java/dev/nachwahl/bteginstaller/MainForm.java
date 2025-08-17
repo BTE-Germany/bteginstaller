@@ -34,7 +34,7 @@ public class MainForm {
         selectOptionalModsButton.addActionListener(e -> {
             JDialog about = new JDialog(frame, "Optionale Mods", true);
             about.setContentPane(new OptionsForm(about,installUtil).OptionFormPanel);
-            about.setSize(500, 300);
+            about.setSize(500, 400);
             about.setLocationRelativeTo(null);
             about.setVisible(true);
             about.toFront();
