@@ -34,8 +34,7 @@ public class MainForm {
         selectOptionalModsButton.addActionListener(e -> {
             JDialog about = new JDialog(frame, "Optionale Mods", true);
             about.setContentPane(new OptionsForm(about,installUtil).OptionFormPanel);
-            about.setResizable(false);
-            about.setSize(500, 300);
+            about.setSize(500, 400);
             about.setLocationRelativeTo(null);
             about.setVisible(true);
             about.toFront();
@@ -44,7 +43,6 @@ public class MainForm {
         selectOptionalShadersButton.addActionListener(e -> {
             JDialog about = new JDialog(frame, "Optionale Shader", true);
             about.setContentPane(new ShadersForm(about,installUtil).ShaderFormPanel);
-            about.setResizable(false);
             about.setSize(500, 300);
             about.setLocationRelativeTo(null);
             about.setVisible(true);
