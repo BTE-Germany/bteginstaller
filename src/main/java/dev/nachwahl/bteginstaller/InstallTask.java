@@ -1,10 +1,6 @@
 package dev.nachwahl.bteginstaller;
 
 import com.google.gson.*;
-import de.schlichtherle.truezip.file.TArchiveDetector;
-import de.schlichtherle.truezip.file.TFile;
-import de.schlichtherle.truezip.file.TFileInputStream;
-import org.apache.commons.io.FilenameUtils;
 
 import javax.swing.*;
 import java.io.*;
@@ -13,7 +9,6 @@ import java.net.URL;
 import java.nio.file.*;
 import java.util.*;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 public class InstallTask extends SwingWorker<Void, Integer> {
     String modpackDownloadURL;
@@ -56,12 +51,11 @@ public class InstallTask extends SwingWorker<Void, Integer> {
         try {
             // MODPACK
             deleteOldFiles(installationPath);
-            System.out.println("Deleted old files");
+            System.out.println("Deleted old files (mods folder)");
             downloadModpack(modpackDownloadURL, installationPath);
             System.out.println("Downloaded modpack");
             unzipModpack(installationPath);
             System.out.println("Unpacked modpack");
-            //unzipFile(Paths.get(new File(installationPath.getAbsolutePath() + fileSeparator + "modpack.zip").getPath()));
             File modpackArchive = new File(installationPath.getAbsolutePath() + fileSeparator + "modpack.zip");
             modpackArchive.delete();
             System.out.println("Deleted modpackArchive");
@@ -75,7 +69,6 @@ public class InstallTask extends SwingWorker<Void, Integer> {
             // FABRIC
             downloadFabric(minecraftPath.getAbsolutePath().toString(), new URL(fabricDownloadURL));
             System.out.println("Downloaded fabric");
-            //unzipFile(Paths.get(new File(minecraftPath.getAbsolutePath() + fileSeparator + "versions"+ fileSeparator + "fabric.zip").getPath()));
             unzipFabric(minecraftPath);
             System.out.println("Unpacked fabric");
             File fabricArchive = new File(minecraftPath.getAbsolutePath() + fileSeparator + "versions"+ fileSeparator + "version.zip");
@@ -121,11 +114,7 @@ public class InstallTask extends SwingWorker<Void, Integer> {
     private boolean deleteOldFiles(File installationPath) {
         progessLabel.setText("Lösche alte Dateien...");
         ArrayList<File> files = new ArrayList<>();
-        files.add(new File(installationPath.getAbsolutePath() + fileSeparator + "config"));
-        files.add(new File(installationPath.getAbsolutePath() + fileSeparator + "fancymenu_data"));
         files.add(new File(installationPath.getAbsolutePath() + fileSeparator + "mods"));
-        files.add(new File(installationPath.getAbsolutePath() + fileSeparator + "resources"));
-        files.add(new File(installationPath.getAbsolutePath() + fileSeparator + "shaderpacks"));
         for (File file : files) {
             if (file.isDirectory()) {
                 try {
@@ -174,6 +163,11 @@ public class InstallTask extends SwingWorker<Void, Integer> {
             System.out.println("Extracting file: " + filePath);
             File file = new File(filePath);
 
+            if (file.exists()) {
+                System.out.println("File already exists, overwriting: " + filePath);
+                file.delete();
+            }
+
             if (!file.exists()) {
                 if (zipEntry.isDirectory()) {
                     file.mkdir();
@@ -208,67 +202,6 @@ public class InstallTask extends SwingWorker<Void, Integer> {
         return true;
 
     }
-/*
-
-        System.out.println("Entpacke Modpack...");
-
-        TFile archive = new TFile(installationPath.getAbsolutePath() + fileSeparator + "modpack.zip");
-        TFile directory = new TFile(installationPath);
-        TFile.cp_rp(archive, directory, TArchiveDetector.NULL, TArchiveDetector.NULL);
-
-        System.out.println("Modpack extraction complete.");
-        return true;
-
-         */
-
-    /*
-    private static void unzipFile(Path filePathToUnzip) {
-
-        Path targetDir = filePathToUnzip.getParent();
-
-        //Open the file
-        try (ZipFile zip = new ZipFile(filePathToUnzip.toFile())) {
-
-            FileSystem fileSystem = FileSystems.getDefault();
-            Enumeration<? extends ZipEntry> entries = zip.entries();
-
-            //We will unzip files in this folder
-            if (!targetDir.toFile().isDirectory()
-                    && !targetDir.toFile().mkdirs()) {
-                throw new IOException("failed to create directory " + targetDir);
-            }
-
-            //Iterate over entries
-            while (entries.hasMoreElements()) {
-                ZipEntry entry = entries.nextElement();
-                File f = new File(targetDir.resolve(Paths.get(entry.getName())).toString());
-
-                //If directory then create a new directory in uncompressed folder
-                if (entry.isDirectory()) {
-                    if (!f.isDirectory() && !f.mkdirs()) {
-                        throw new IOException("failed to create directory " + f);
-                    }
-                }
-
-                //Else create the file
-                else {
-                    File parent = f.getParentFile();
-                    if (!parent.isDirectory() && !parent.mkdirs()) {
-                        throw new IOException("failed to create directory " + parent);
-                    }
-
-                    try(InputStream in = zip.getInputStream(entry)) {
-                        Files.copy(in, f.toPath());
-                    }
-
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-     */
 
     private boolean downloadOptionalMods(String modsFolder) throws IOException {
         for (Modpack m : Installer.modpacks) {
